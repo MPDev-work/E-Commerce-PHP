@@ -28,7 +28,7 @@
             <label class="text-base font-normal text-black">Product Qty<span class="text-red-600">*</span></label>
             <input id="p_qty" value="<?= $row['p_qty'] ?>" class="w-full h-12 border border-gray-300 transition duration-300 focus:border-gray-500 focus:outline-0 hover:border-gray-500 rounded-full text-black px-5" type="number" name="p_qty" placeholder="Product qty" require>
             <label class="text-base font-normal text-blac2 ">Product Description<span class="text-red-600">*</span></label>
-            <textarea id="desciption" class="w-full h-[140px] rounded-3xl text-black p-5 border border-gray-300 transition duration-300 focus:border-gray-500 focus:outline-0 hover:border-gray-500" name="description" placeholder="Enter product description"><?= $row['desciption'] ?></textarea>
+            <textarea id="description" class="w-full h-[140px] rounded-3xl text-black p-5 border border-gray-300 transition duration-300 focus:border-gray-500 focus:outline-0 hover:border-gray-500" name="description" placeholder="Enter product description"><?= $row['description'] ?></textarea>
             <label class="text-base font-normal text-blac2 ">Product image<span class="text-red-600">*</span></label>
             <div class="w-full h-max flex flex-col p-2 rounded-3xl border border-gray-300 transition duration-300 hover:border-gray-500">
                 <input id="p_image" class="cursor-pointer w-full" type="file" name="p_image" onchange="handleChange(this)">

@@ -1,1 +1,51 @@
 npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch
+
+<?php
+include "./config/connect.php";
+
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+
+    $id = $_POST["id"];
+    $title = $_POST["title"];
+    $price = $_POST["price"];
+    $qty = $_POST["qty"];
+    $des = $_POST["des"];
+
+    if (!empty($_FILES["image"]["name"])) {
+
+        $old_image = $conn->query("SELECT * FROM products WHERE p_id = $id")->fetch_assoc();
+
+        if (!empty($old_image["p_image"]) && file_exists($old_image["p_image"])) {
+            unlink($old_image["p_image"]);
+        }
+
+        $image_name = $_FILES["image"]["name"];
+        $tmp_name = $_FILES["image"]["tmp_name"];
+
+        $path = "images/" . time() . "_" . $image_name;
+        
+        move_uploaded_file($tmp_name, $path);
+
+        $updated = $conn->query("UPDATE products SET
+            p_title = '$title',
+            p_price = $price,
+            p_qty = $qty,
+            p_image = '$path',
+            desciption = '$des'
+            WHERE p_id = $id");
+
+    } else {
+
+        $updated = $conn->query("UPDATE products SET
+            p_title = '$title',
+            p_price = $price,
+            p_qty = $qty,
+            desciption = '$des'
+            WHERE p_id = $id");
+    }
+
+    if ($updated) {
+        echo "Updated Successfully";
+    }
+}
+?>
