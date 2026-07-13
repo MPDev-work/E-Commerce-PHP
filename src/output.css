@@ -14,7 +14,6 @@
     --color-amber-600: oklch(66.6% 0.179 58.318);
     --color-green-100: oklch(96.2% 0.044 156.743);
     --color-green-700: oklch(52.7% 0.154 150.069);
-    --color-emerald-400: oklch(76.5% 0.177 163.223);
     --color-emerald-500: oklch(69.6% 0.17 162.48);
     --color-teal-800: oklch(43.7% 0.078 188.216);
     --color-sky-600: oklch(58.8% 0.158 241.966);
@@ -241,6 +240,9 @@
   .right-1\.5 {
     right: calc(var(--spacing) * 1.5);
   }
+  .bottom-0 {
+    bottom: 0;
+  }
   .bottom-1 {
     bottom: var(--spacing);
   }
@@ -262,17 +264,8 @@
   .left-2\.5 {
     left: calc(var(--spacing) * 2.5);
   }
-  .left-20 {
-    left: calc(var(--spacing) * 20);
-  }
-  .left-40 {
-    left: calc(var(--spacing) * 40);
-  }
   .z-\[999\] {
     z-index: 999;
-  }
-  .mx-auto {
-    margin-inline: auto;
   }
   .my-2 {
     margin-block: calc(var(--spacing) * 2);
@@ -351,6 +344,12 @@
   }
   .ml-5 {
     margin-left: calc(var(--spacing) * 5);
+  }
+  .ml-8 {
+    margin-left: calc(var(--spacing) * 8);
+  }
+  .ml-\[240px\] {
+    margin-left: 240px;
   }
   .block {
     display: block;
@@ -439,6 +438,9 @@
   .w-1\/2 {
     width: calc(1 / 2 * 100%);
   }
+  .w-10 {
+    width: calc(var(--spacing) * 10);
+  }
   .w-12 {
     width: calc(var(--spacing) * 12);
   }
@@ -450,6 +452,9 @@
   }
   .w-\[200px\] {
     width: 200px;
+  }
+  .w-\[240px\] {
+    width: 240px;
   }
   .w-\[400px\] {
     width: 400px;
@@ -466,17 +471,20 @@
   .w-\[calc\(100\%\/3-40px\/3\)\] {
     width: calc(100% / 3 - 40px / 3);
   }
+  .w-\[calc\(100vw-240px\)\] {
+    width: calc(100vw - 240px);
+  }
   .w-auto {
     width: auto;
   }
   .w-full {
     width: 100%;
   }
+  .w-max {
+    width: max-content;
+  }
   .w-screen {
     width: 100vw;
-  }
-  .max-w-7xl {
-    max-width: var(--container-7xl);
   }
   .max-w-sm {
     max-width: var(--container-sm);
@@ -570,6 +578,9 @@
   .rounded-3xl {
     border-radius: var(--radius-3xl);
   }
+  .rounded-\[12px\] {
+    border-radius: 12px;
+  }
   .rounded-\[40px\] {
     border-radius: 40px;
   }
@@ -602,6 +613,10 @@
   .border-1 {
     border-style: var(--tw-border-style);
     border-width: 1px;
+  }
+  .border-r {
+    border-right-style: var(--tw-border-style);
+    border-right-width: 1px;
   }
   .border-r-2 {
     border-right-style: var(--tw-border-style);
@@ -651,6 +666,9 @@
   }
   .bg-blue-100 {
     background-color: var(--color-blue-100);
+  }
+  .bg-blue-500 {
+    background-color: var(--color-blue-500);
   }
   .bg-emerald-500 {
     background-color: var(--color-emerald-500);
@@ -729,6 +747,9 @@
   .p-2 {
     padding: calc(var(--spacing) * 2);
   }
+  .p-4 {
+    padding: calc(var(--spacing) * 4);
+  }
   .p-5 {
     padding: calc(var(--spacing) * 5);
   }
@@ -774,9 +795,6 @@
   .py-4 {
     padding-block: calc(var(--spacing) * 4);
   }
-  .py-6 {
-    padding-block: calc(var(--spacing) * 6);
-  }
   .py-16 {
     padding-block: calc(var(--spacing) * 16);
   }
@@ -795,8 +813,14 @@
   .pr-5 {
     padding-right: calc(var(--spacing) * 5);
   }
+  .pr-8 {
+    padding-right: calc(var(--spacing) * 8);
+  }
   .pr-17 {
     padding-right: calc(var(--spacing) * 17);
+  }
+  .pb-6 {
+    padding-bottom: calc(var(--spacing) * 6);
   }
   .pb-12 {
     padding-bottom: calc(var(--spacing) * 12);
@@ -810,6 +834,9 @@
   .pl-2 {
     padding-left: calc(var(--spacing) * 2);
   }
+  .pl-2\.5 {
+    padding-left: calc(var(--spacing) * 2.5);
+  }
   .pl-4 {
     padding-left: calc(var(--spacing) * 4);
   }
@@ -818,6 +845,9 @@
   }
   .pl-\[20px\] {
     padding-left: 20px;
+  }
+  .pl-\[260px\] {
+    padding-left: 260px;
   }
   .text-center {
     text-align: center;
@@ -930,8 +960,14 @@
   .text-balance {
     text-wrap: balance;
   }
+  .text-nowrap {
+    text-wrap: nowrap;
+  }
   .text-wrap {
     text-wrap: wrap;
+  }
+  .whitespace-nowrap {
+    white-space: nowrap;
   }
   .text-\[\#d3d3d6\] {
     color: #d3d3d6;
@@ -1035,6 +1071,20 @@
     --tw-duration: 300ms;
     transition-duration: 300ms;
   }
+  .group-hover\:block {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        display: block;
+      }
+    }
+  }
+  .group-hover\:hidden {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        display: none;
+      }
+    }
+  }
   .hover\:border-\[\#dc3545\] {
     &:hover {
       @media (hover: hover) {
@@ -1088,6 +1138,20 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-sky-700);
+      }
+    }
+  }
+  .hover\:bg-white {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-white);
+      }
+    }
+  }
+  .hover\:text-black {
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-black);
       }
     }
   }
