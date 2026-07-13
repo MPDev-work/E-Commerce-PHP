@@ -16,10 +16,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $image_name = $_FILES['p_image']['name'];
         $tmp_name = $_FILES['p_image']['tmp_name'];
 
-        $path = "images/" . time() . $image_name;
+        $path = "images/" . time() . "_" . $image_name;
 
         if (move_uploaded_file($tmp_name, "images/" . $image_name)) {
-            $old_path = "images/" . $old_image;
+            $old_path = "images/" . time() . "_" . $old_image;
             if (file_exists($old_path)) {
                 unlink($old_path);
             }

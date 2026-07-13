@@ -3,4 +3,5 @@
 html,
 body {
   font-family: 'Poppins', sans-serif;
+  scrollbar-width: none;
 }
