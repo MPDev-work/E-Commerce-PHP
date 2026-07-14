@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="src/output.css" />
+    <link rel="stylesheet" href="../../src/output.css" />
     <title>Document</title>
 </head>
 <body>
     <div class="w-screen h-max flex flex-col justify-center items-center bg-[#f2f2f6] gap-5">
         <h1 class="font-medium text-3xl text-black mt-10">Add product</h1>
-        <form class="w-[500px] h-max flex flex-col gap-2 p-5 bg-white rounded-3xl mb-10" action="insert.php" method="POST" enctype="multipart/form-data">
+        <form class="w-[500px] h-max flex flex-col gap-2 p-5 bg-white rounded-3xl mb-10" action="store.php" method="POST" enctype="multipart/form-data">
             <input class="bg-[#f2f2f6] w-full h-12 border border-gray-300 transition duration-300 focus:border-gray-500 focus:outline-0 hover:border-gray-500 rounded-full text-black px-5" type="number" name="id" hidden>
             <label class="text-base font-normal text-black">Product title<span class="text-red-600">*</span></label>
             <input class="bg-[#f2f2f6] w-full h-12 border border-gray-300 transition duration-300 focus:border-gray-500 focus:outline-0 hover:border-gray-500 rounded-full text-black px-5" type="text" name="p_title" placeholder="Product title" require>
@@ -29,7 +29,7 @@
             </div>
             <div class="w-full flex flex-row justify-start items-center gap-2">
                 <button class="cursor-pointer h-12 rounded-full px-12 text-white bg-emerald-500" type="submit">Add product</button>
-                <a href="./admin/dashboard.php" class="cursor-pointer h-12 rounded-full px-12 text-white bg-red-500 flex justify-center items-center">Cencel</a>
+                <a href="../page/products.php" class="cursor-pointer h-12 rounded-full px-12 text-white bg-red-500 flex justify-center items-center">Cencel</a>
             </div>
         </form>
     </div>

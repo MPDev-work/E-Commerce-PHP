@@ -45,12 +45,12 @@ pricing, and product information.', ['addProduct.php', 'Add product',
         </td>
         <td class="px-5 py-3 text-right">
           <a
-            href="../../update_form.php?id=<?= e($product['p_id']) ?>"
+            href="../products/edit.php?id=<?= e($product['p_id']) ?>"
             class="rounded-xl bg-amber-500/20 px-4 py-2.5 text-amber-700"
             >Edit</a
           >
           <a
-            href="../../delete.php?id=<?= e($product['p_id']) ?>"
+            href="../products/delete.php?id=<?= e($product['p_id']) ?>"
             onclick="return confirm('Delete this product?');"
             class="rounded-xl bg-red-500/20 px-4 py-2.5 text-red-600"
             >Delete</a

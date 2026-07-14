@@ -1,5 +1,5 @@
 <?php
-include "./config/connect.php";
+include "../../config/connect.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
@@ -16,10 +16,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $image_name = $_FILES['p_image']['name'];
         $tmp_name = $_FILES['p_image']['tmp_name'];
 
-        $path = "images/" . time() . "_" . $image_name;
+        $path = __DIR__ . "/../../images/" . time() . "_" . $image_name;
 
-        if (move_uploaded_file($tmp_name, "images/" . $image_name)) {
-            $old_path = "images/" . time() . "_" . $old_image;
+        if (move_uploaded_file($tmp_name, __DIR__ . "/../../images/" . $image_name)) {
+            $old_path = __DIR__ . "/../../images/" . time() . "_" . $old_image;
             if (file_exists($old_path)) {
                 unlink($old_path);
             }
@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             WHERE p_id = $id";
 
     if (mysqli_query($conn, $sql)) {
-        header("Location: ./admin/dashboard.php");
+        header("Location: ../page/products.php");
         exit();
     } else {
         echo "Error: " . mysqli_error($conn);

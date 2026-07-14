@@ -1,5 +1,5 @@
 <?php
-include "./config/connect.php";
+include "../../config/connect.php";
 
 if($_SERVER['REQUEST_METHOD'] === "POST"){
     $title = $_POST['p_title'];
@@ -11,7 +11,7 @@ if($_SERVER['REQUEST_METHOD'] === "POST"){
         $image_name = $_FILES['p_image']['name'];
         $image_tmp  = $_FILES['p_image']['tmp_name'];
         
-        $path = "images/" . time() . $image_name;
+        $path = __DIR__ . "/../../images/" . time() . $image_name;
         move_uploaded_file($image_tmp, $path);
 
         $sql = $conn->query("INSERT INTO products (p_title, p_price, p_qty, description, p_image)
@@ -24,10 +24,10 @@ if($_SERVER['REQUEST_METHOD'] === "POST"){
     }
 
     if ($sql) {
-        header("Location: ./admin/dashboard.php");
+        header("Location: ../page/products.php");
         exit;
     } else {
-        header("location: insert_form.php");
+        header("Location: create.php");
         exit;
     }
 }

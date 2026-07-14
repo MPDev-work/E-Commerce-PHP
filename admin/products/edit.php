@@ -1,5 +1,5 @@
 <?php
-    include "./config/connect.php";
+    include "../../config/connect.php";
 
     $id = $_GET['id'];
     $sql = "SELECT * FROM products WHERE p_id = '$id'";
@@ -12,7 +12,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="src/output.css" />
+    <link rel="stylesheet" href="../../src/output.css" />
     <title>Wexh | Store</title>
 </head>
 <body>
@@ -32,15 +32,15 @@
             <label class="text-base font-normal text-blac2 ">Product image<span class="text-red-600">*</span></label>
             <div class="w-full h-max flex flex-col p-2 rounded-3xl border border-gray-300 transition duration-300 hover:border-gray-500">
                 <input id="p_image" class="cursor-pointer w-full" type="file" name="p_image" onchange="handleChange(this)">
-                <img id="preview" src="./images/<?= $row['p_image'] ?>" class="w-[200px] h-[200px] transition duration-200 object-cover rounded-2xl mt-2.5">
+                <img id="preview" src="../../images/<?= $row['p_image'] ?>" class="w-[200px] h-[200px] transition duration-200 object-cover rounded-2xl mt-2.5">
             </div>
             <div class="w-full flex flex-row justify-start items-center gap-2">
                 <button type="submit" class="cursor-pointer h-12 rounded-full px-12 text-white bg-emerald-500">Update product</button>   
-                <a href="./admin/dashboard.php" class="cursor-pointer h-12 rounded-full px-12 text-white bg-red-500 flex justify-center items-center">Cencel</a>
+                <a href="../page/products.php" class="cursor-pointer h-12 rounded-full px-12 text-white bg-red-500 flex justify-center items-center">Cencel</a>
             </div>
         </form>
         <!-- <div id="preview-pop-up" class="absolute opacity-0 w-1/2 h-1/2 rounded-3xl overflow-hidden flex justify-center items-center transition duration-200">
-            <img class="w-full h-full object-cover" src="./images/<?= $row['p_image'] ?>">
+            <img class="w-full h-full object-cover" src="../../images/<?= $row['p_image'] ?>">
         </div> -->
     </div>
 <script>
