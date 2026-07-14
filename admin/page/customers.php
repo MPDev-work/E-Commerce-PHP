@@ -1,0 +1,7 @@
+<?php
+require_once __DIR__ . '/_layout.php';
+$customers = $conn->query("SELECT u.id, u.username, u.email, COUNT(o.order_id) AS orders_count, COALESCE(SUM(o.total_amount), 0) AS spent FROM users u LEFT JOIN orders o ON o.user_id = u.id AND o.status = 'completed' WHERE u.roles <> 'admin' GROUP BY u.id, u.username, u.email ORDER BY u.id DESC");
+admin_header('Customers', 'customers.php'); page_title('People', 'Customers', 'See who shops with you and their purchase activity.');
+?>
+<div class="overflow-x-auto rounded-[24px] border border-slate-100"><table class="w-full min-w-[700px] text-left text-sm"><thead class="bg-black text-white"><tr><th class="px-5 py-4">Customer</th><th class="px-5 py-4">Customer ID</th><th class="px-5 py-4">Completed orders</th><th class="px-5 py-4">Total spent</th></tr></thead><tbody><?php if ($customers && $customers->num_rows): while ($customer = $customers->fetch_assoc()): ?><tr class="border-b border-slate-100 last:border-0 hover:bg-[#f2f2f6]"><td class="px-5 py-4 font-medium"><?= e($customer['username']) ?><small class="block font-normal text-slate-400"><?= e($customer['email']) ?></small></td><td class="px-5 py-4 text-slate-500">#<?= e($customer['id']) ?></td><td class="px-5 py-4"><?= e($customer['orders_count']) ?></td><td class="px-5 py-4">$<?= number_format((float)$customer['spent'], 2) ?></td></tr><?php endwhile; else: ?><tr><td colspan="4" class="px-5 py-12 text-center text-slate-400">No customers yet.</td></tr><?php endif; ?></tbody></table></div>
+<?php admin_footer(); ?>

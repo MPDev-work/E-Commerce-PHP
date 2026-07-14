@@ -58,8 +58,8 @@
             <div class="flex flex-row gap-1/2 gap-1">
                 <div class="w-10 h-10 rounded-full bg-gray-300 flex justify-center items-center text-white"><?= htmlspecialchars(ucwords(substr($user['username'], 0, 1))) ?></div>
                 <div class="flex flex-col justify-center">
-                    <h1 class="text-base text-black"><?= htmlspecialchars(ucwords($user['username'])) ?></h1>
-                    <p class="text-blue-500 text-xs"><?= htmlspecialchars(ucwords($user['roles'])) ?></p>
+                    <h1 class="text-sm text-black leading-[1.2]"><?= htmlspecialchars(ucwords($user['username'])) ?></h1>
+                    <p class="text-blue-500 text-xs leading-[1.2]"><?= htmlspecialchars($user['roles']) ? 'Active' : '' ?></p>
                 </div>
             </div>
           </div>
