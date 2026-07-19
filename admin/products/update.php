@@ -1,46 +1,77 @@
 <?php
-include "../../config/connect.php";
+require_once __DIR__ . '/../../config/connect.php';
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header('Location: ../page/products.php');
+    exit;
+}
 
-    $id = (int)$_POST['id'];
-    $title = mysqli_real_escape_string($conn, $_POST['p_title']);
-    $price = $_POST['p_price'];
-    $qty = $_POST['p_qty'];
-    $desc = mysqli_real_escape_string($conn, $_POST['description']);
-    $old_image = $_POST['old_image'];
-    $image_name = $old_image;
+$id = (int)($_POST['id'] ?? 0);
+$title = trim($_POST['p_title'] ?? '');
+$price = (float)($_POST['p_price'] ?? 0);
+$qty = max(0, (int)($_POST['p_qty'] ?? 0));
+$description = trim($_POST['description'] ?? '');
 
-    if (!empty($_FILES['p_image']['name'])) {
+if (!$id || $title === '') {
+    header('Location: edit.php?id=' . $id);
+    exit;
+}
 
-        $image_name = $_FILES['p_image']['name'];
-        $tmp_name = $_FILES['p_image']['tmp_name'];
+/* Read the current value from the database instead of trusting a posted path. */
+$currentStmt = $conn->prepare('SELECT p_image FROM products WHERE p_id = ?');
+$currentStmt->bind_param('i', $id);
+$currentStmt->execute();
+$current = $currentStmt->get_result()->fetch_assoc();
+if (!$current) {
+    header('Location: ../page/products.php');
+    exit;
+}
 
-        $path = __DIR__ . "/../../images/" . time() . "_" . $image_name;
+$imageName = basename((string)($current['p_image'] ?? ''));
+$oldImageName = $imageName;
+$uploadedNewImage = false;
 
-        if (move_uploaded_file($tmp_name, __DIR__ . "/../../images/" . $image_name)) {
-            $old_path = __DIR__ . "/../../images/" . time() . "_" . $old_image;
-            if (file_exists($old_path)) {
-                unlink($old_path);
-            }
-        } else {
-            $image_name = $old_image;
-        }
+if (isset($_FILES['p_image']) && $_FILES['p_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+    if ($_FILES['p_image']['error'] !== UPLOAD_ERR_OK || !is_uploaded_file($_FILES['p_image']['tmp_name'])) {
+        header('Location: edit.php?id=' . $id . '&error=image');
+        exit;
     }
 
-    $sql = "UPDATE products SET
-            p_title = '$title',
-            p_price = '$price',
-            p_qty = '$qty',
-            description = '$desc',
-            p_image = '$image_name'
-            WHERE p_id = $id";
+    $extension = strtolower(pathinfo($_FILES['p_image']['name'], PATHINFO_EXTENSION));
+    $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!in_array($extension, $allowedExtensions, true)) {
+        header('Location: edit.php?id=' . $id . '&error=image');
+        exit;
+    }
 
-    if (mysqli_query($conn, $sql)) {
-        header("Location: ../page/products.php");
-        exit();
-    } else {
-        echo "Error: " . mysqli_error($conn);
+    $imageName = bin2hex(random_bytes(12)) . '.' . $extension;
+    $destination = __DIR__ . '/../../images/' . $imageName;
+    if (!move_uploaded_file($_FILES['p_image']['tmp_name'], $destination)) {
+        header('Location: edit.php?id=' . $id . '&error=image');
+        exit;
+    }
+    $uploadedNewImage = true;
+}
+
+$stmt = $conn->prepare('UPDATE products SET p_title = ?, p_price = ?, p_qty = ?, description = ?, p_image = ? WHERE p_id = ?');
+$stmt->bind_param('sdissi', $title, $price, $qty, $description, $imageName, $id);
+
+if (!$stmt->execute()) {
+    if ($uploadedNewImage && is_file(__DIR__ . '/../../images/' . $imageName)) {
+        unlink(__DIR__ . '/../../images/' . $imageName);
+    }
+    header('Location: edit.php?id=' . $id . '&error=save');
+    exit;
+}
+
+/* Remove only the old, local file after the product references the new one. */
+if ($uploadedNewImage && $oldImageName && $oldImageName !== $imageName) {
+    $oldPath = __DIR__ . '/../../images/' . $oldImageName;
+    if (is_file($oldPath)) {
+        unlink($oldPath);
     }
 }
+
+header('Location: ../page/products.php');
+exit;
 ?>

@@ -19,11 +19,13 @@ if (!$user) {
     exit;
 }
 
-function e($value): string {
+function e($value): string
+{
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
-function scalar(mysqli $conn, string $sql, string $field = 'total') {
+function scalar(mysqli $conn, string $sql, string $field = 'total')
+{
     $result = $conn->query($sql);
     $row = $result ? $result->fetch_assoc() : [];
     return $row[$field] ?? 0;
