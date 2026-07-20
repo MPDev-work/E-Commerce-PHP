@@ -32,7 +32,7 @@ $grandTotal = $subtotal + $delivery - $discount;
 // Group items by brand/vendor
 $grouped_items = [];
 foreach ($items as $product) {
-  $brand = 'Solis Skin';
+  $brand = store_name();
   if (isset($product['category_name'])) {
     if (strcasecmp($product['category_name'], 'Blush') === 0 || strcasecmp($product['category_name'], 'Other Product') === 0) {
       $brand = 'Miss Sunflower';
@@ -205,7 +205,7 @@ store_header('Shopping bag');
             <!-- <a class="black-checkout-btn" href="checkout.php">
               Check Out Now <i class="bi bi-arrow-up-right"></i>
             </a> -->
-            <a class="black-checkout-btn">
+            <a class="black-checkout-btn" href="checkout.php">
               Check Out Now <i class="bi bi-arrow-up-right"></i>
             </a>
           </div>

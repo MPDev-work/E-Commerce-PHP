@@ -25,20 +25,25 @@ $user =
   $stmt->get_result()->fetch_assoc();
 $sql = $conn->query("SELECT * FROM products
     ORDER BY p_id DESC");
+$storeName = 'Solis Skin';
+$storeResult = $conn->query("SELECT setting_value FROM store_settings WHERE setting_key = 'store_name' LIMIT 1");
+if ($storeResult && ($store = $storeResult->fetch_assoc()) && trim($store['setting_value']) !== '') {
+  $storeName = trim($store['setting_value']);
+}
 ?>
 
 <!DOCTYPE html>
 <html>
 
 <head>
-  <title>Admin | Dashboard</title>
+  <title>Admin | <?= htmlspecialchars($storeName) ?></title>
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
   <nav
     class="fixed z-[999] inset-x-0 top-0 h-16 flex justify-between items-center bg-[#f2f2f6] backdrop-blur-3xl px-2.5">
-    <h1 class="uppercase font-medium text-3xl text-black">solis skin</h1>
+    <h1 class="uppercase font-medium text-3xl text-black"><?= htmlspecialchars($storeName) ?></h1>
     <div class="h-12 flex items-center gap-5">
       <div class="h-full w-max flex justify-center items-center gap-2 pr-8 border-r-2 border-gray-500">
         <div class="h-10 w-10 rounded-full bg-blue-500 flex justify-center items-center text-white">
@@ -62,31 +67,31 @@ $sql = $conn->query("SELECT * FROM products
     <div class="w-full h-max flex flex-col gap-2">
       <p class="text-sm text-gray-400">Main menu</p>
       <div class="w-full flex flex-col bg-white rounded-[30px] overflow-hidden gap-1 p-2.5">
-        <a class="group w-full h-10 flex justity-start items-center gap-2 pl-2.5 rounded-full text-white text-sm bg-black"
+        <a class="group w-full h-10 flex items-center gap-2 pl-2.5 rounded-full text-white text-sm bg-black"
           href="#">
           <i class="bi bi-house-fill hidden group-hover:block"></i>
           <i class="bi bi-house group-hover:hidden"></i>
           Overview
         </a>
-        <a class="group w-full h-10 flex justity-start items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
+        <a class="group w-full h-10 flex items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
           href="#">
           <i class="bi bi-house-fill hidden group-hover:block"></i>
           <i class="bi bi-house group-hover:hidden"></i>
           Order
         </a>
-        <a class="group w-full h-10 flex justity-start items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
+        <a class="group w-full h-10 flex items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
           href="#">
           <i class="bi bi-house-fill hidden group-hover:block"></i>
           <i class="bi bi-house group-hover:hidden"></i>
           Add Products
         </a>
-        <a class="group w-full h-10 flex justity-start items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
+        <a class="group w-full h-10 flex items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
           href="#">
           <i class="bi bi-house-fill hidden group-hover:block"></i>
           <i class="bi bi-house group-hover:hidden"></i>
           All products
         </a>
-        <a class="group w-full h-10 flex justity-start items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
+        <a class="group w-full h-10 flex items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
           href="#">
           <i class="bi bi-house-fill hidden group-hover:block"></i>
           <i class="bi bi-house group-hover:hidden"></i>
@@ -97,13 +102,13 @@ $sql = $conn->query("SELECT * FROM products
     <div class="w-full h-max flex flex-col gap-2">
       <p class="text-sm text-gray-400">Account Info</p>
       <div class="w-full flex flex-col bg-white rounded-[30px] overflow-hidden gap-1 p-2.5">
-        <a class="group w-full h-10 flex justity-start items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
+        <a class="group w-full h-10 flex items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
           href="#">
           <i class="bi bi-house-fill hidden group-hover:block"></i>
           <i class="bi bi-house group-hover:hidden"></i>
           Edit profile
         </a>
-        <a class="group w-full h-10 flex justity-start items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
+        <a class="group w-full h-10 flex items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
           href="#">
           <i class="bi bi-house-fill hidden group-hover:block"></i>
           <i class="bi bi-house group-hover:hidden"></i>
@@ -114,18 +119,23 @@ $sql = $conn->query("SELECT * FROM products
     <div class="w-full h-max flex flex-col gap-2">
       <p class="text-sm text-gray-400">Support</p>
       <div class="w-full flex flex-col bg-white rounded-[30px] overflow-hidden gap-1 p-2.5">
-        <a class="group w-full h-10 flex justity-start items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
+        <a class="group w-full h-10 flex items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
           href="www.google.com" target="_blank">
           <i class="bi bi-house-fill hidden group-hover:block"></i>
           <i class="bi bi-house group-hover:hidden"></i>
           Help Center
         </a>
+        <a class="group w-full h-10 flex items-center gap-2 pl-2.5 rounded-full text-gray-400 text-sm transition duration-200 hover:text-white hover:bg-black"
+          href="../auth/logout.php">
+          <i class="bi bi-arrow-bar-left text-gray-400 transition duration-200 group-hover:text-white"></i>
+          Log out
+        </a>
       </div>
     </div>
-    <a class="group absolute bottom-2.5 w-[calc(100%-20px)] h-10 rounded-full border border-gray-300 text-gray-400 flex justify-center items-center gap-1 text-sm transition duration-200 hover:bg-black hover:text-white hover:border-black"
+    <!-- <a class="group absolute bottom-2.5 w-[calc(100%-20px)] h-10 rounded-full border border-gray-300 text-gray-400 flex justify-center items-center gap-1 text-sm transition duration-200 hover:bg-black hover:text-white hover:border-black"
       href="../auth/logout.php"><i
         class="bi bi-arrow-bar-left text-gray-400 transition duration-200 group-hover:text-white"></i>
-      Log out</a>
+      Log out</a> -->
   </nav>
   <!-- <?php include "includes/sidebar.php"; ?>
 <div class="main">

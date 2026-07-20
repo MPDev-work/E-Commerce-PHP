@@ -4,20 +4,33 @@ session_start();
 require_once "../config/connect.php";
 
 // ==================== Login ====================
-if(isset($_POST['register'])){
+if (isset($_POST['register'])) {
 
-    $username = $_POST['username'];
-    $email = $_POST['email'];
+    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $email = mysqli_real_escape_string($conn, $_POST['email']);
     $pwd = password_hash($_POST['pwd'], PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO users(username,email,pwd)
-            VALUES('$username','$email','$pwd')";
+    // Check if email already exists
+    $check = "SELECT * FROM users WHERE email = '$email'";
+    $result = mysqli_query($conn, $check);
 
-    if(mysqli_query($conn,$sql)){
-        header("Location: ../auth/login.php");
+    if (mysqli_num_rows($result) > 0) {
+        echo "<script>
+            alert('Email already registered.');
+            window.location.href = '../auth/login.php';
+          </script>";
         exit();
-    }else{
-        echo "Register Failed";
+    } else {
+
+        $sql = "INSERT INTO users(username, email, pwd)
+                VALUES('$username', '$email', '$pwd')";
+
+        if (mysqli_query($conn, $sql)) {
+            header("Location: ../auth/login.php");
+            exit();
+        } else {
+            echo "Register Failed";
+        }
     }
 }
 if (isset($_POST['login'])) {
@@ -43,13 +56,11 @@ if (isset($_POST['login'])) {
             } else {
                 header("location: ../client/indexAfter.php");
             }
-
         } else {
 
             $_SESSION["pwd_error"] = "Password not match";
             header("location: ../auth/login.php");
         }
-
     } else {
 
         $_SESSION["email_error"] = "Email Not Found";

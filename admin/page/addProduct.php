@@ -109,7 +109,14 @@ page_title('Catalogue', $editing ? 'Edit product' : 'Add product', $editing ? 'U
             <?= $editing ? '(leave empty to keep current image)' : '' ?><input accept="image/png,image/jpeg,image/webp"
                 type="file" id="image" name="p_image"
                 class="mt-2 block w-full rounded-full bg-white px-4 py-3 text-sm"></label>
-        <img id="preview" class="w-[240px] h-0 object-cover rounded-3xl border-0 border-gray-300">
+        <div id="preview-container" class="<?= $product['p_image'] ? '' : 'hidden' ?> md:col-span-2">
+            <p class="mb-2 text-sm font-medium text-slate-600">Image preview</p>
+            <img
+                src="<?= $product['p_image'] ? '../../images/' . e(basename($product['p_image'])) : '' ?>"
+                id="preview"
+                alt="Product image preview"
+                class="h-[240px] w-[240px] rounded-3xl border border-gray-200 object-cover">
+        </div>
     </div>
     <div class="mt-5 grid gap-5 md:grid-cols-2">
         <fieldset>
@@ -129,20 +136,29 @@ page_title('Catalogue', $editing ? 'Edit product' : 'Add product', $editing ? 'U
             </div>
         </fieldset>
     </div><label class="mt-5 block text-sm font-medium">Description<textarea name="description" rows="5"
-            class="mt-2 w-full rounded-2xl bg-white p-4 outline-none"><?= e($product['description']) ?></textarea></label><?php if ($editing && $product['p_image']): ?><img
-            src="../../images/<?= e($product['p_image']) ?>" class="mt-4 h-28 w-28 rounded-2xl object-cover"
-            alt="Current product image"><?php endif; ?><div class="mt-5 flex gap-3"><button
+            class="mt-2 w-full rounded-2xl bg-white p-4 outline-none"><?= e($product['description']) ?></textarea></label>
+    <!-- <img
+        id="preview"
+        src="../../images/<?= e($product['p_image']) ?>" class="w-[240px] aspect-sqaure object-cover rounded-3xl border-1 border-gray-300"
+        alt="Current product image"> -->
+    <div class="mt-5 flex gap-3"><button
             class="rounded-full bg-black px-6 py-3 text-sm text-white"><?= $editing ? 'Update product' : 'Save product' ?></button><a
             href="products.php" class="rounded-full border border-slate-300 px-6 py-3 text-sm">Cancel</a></div>
 </form>
 <script>
-    const Image = document.getElementById('image');
-    const Preview = document.getElementById('preview');
+    const imageInput = document.getElementById('image');
+    const preview = document.getElementById('preview');
+    const previewContainer = document.getElementById('preview-container');
+    let previewUrl = null;
 
-    Image.addEventListener('change', function() {
-        Preview.style.height = '240px';
-        Preview.style.border = '1px';
-        Preview.src = URL.createObjectURL(this.files[0]);
-    })
+    imageInput.addEventListener('change', function() {
+        const file = this.files && this.files[0];
+        if (!file) return;
+
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = URL.createObjectURL(file);
+        preview.src = previewUrl;
+        previewContainer.classList.remove('hidden');
+    });
 </script>
 <?php admin_footer(); ?>

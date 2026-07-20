@@ -4,18 +4,18 @@ require_once __DIR__ . '/_store.php';
 $all_products = catalogue();
 $groups = [];
 foreach ($all_products as $product) {
-    $cat = $product['category_name'] ?: 'Skincare';
-    $groups[$cat][] = $product;
+  $cat = $product['category_name'] ?: 'Skincare';
+  $groups[$cat][] = $product;
 }
 
 $desired_order = ['Blush', 'Cleanser', 'Toner', 'Sunscreen', 'Serum', 'Collection', 'Other Product'];
 // Sort groups by desired order
-uksort($groups, function($a, $b) use ($desired_order) {
-    $pos_a = array_search($a, $desired_order);
-    $pos_b = array_search($b, $desired_order);
-    if ($pos_a === false) return 1;
-    if ($pos_b === false) return -1;
-    return $pos_a - $pos_b;
+uksort($groups, function ($a, $b) use ($desired_order) {
+  $pos_a = array_search($a, $desired_order);
+  $pos_b = array_search($b, $desired_order);
+  if ($pos_a === false) return 1;
+  if ($pos_b === false) return -1;
+  return $pos_a - $pos_b;
 });
 
 store_header('Skincare categories');

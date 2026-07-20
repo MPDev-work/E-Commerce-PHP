@@ -3,7 +3,8 @@ require_once __DIR__ . '/_layout.php';
 $notice = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $storeName = trim($_POST['store_name'] ?? 'Solis Skin');
-    $currency = $_POST['currency'] ?? 'USD';
+    $currency = strtoupper($_POST['currency'] ?? 'USD');
+    if (!in_array($currency, ['USD', 'KHR', 'EUR', 'CNY'], true)) $currency = 'USD';
     $stmt = $conn->prepare("INSERT INTO store_settings (setting_key, setting_value) VALUES ('store_name', ?), ('currency', ?) ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value)");
     $stmt->bind_param('ss', $storeName, $currency);
     $stmt->execute();
@@ -23,10 +24,14 @@ page_title('Account', 'Store settings', 'Control the basics that appear across y
                 class="mt-2 w-full rounded-full bg-white px-4 py-3 outline-none"></label><label
             class="text-sm font-medium">Currency<select name="currency"
                 class="mt-2 w-full rounded-full bg-white px-4 py-3 outline-none">
-                <option <?= ($settings['currency'] ?? 'USD') === 'USD' ? 'selected' : '' ?>>USD</option>
-                <option <?= ($settings['currency'] ?? '') === 'KHR' ? 'selected' : '' ?>>THB</option>
-                <option <?= ($settings['currency'] ?? '') === 'EUR' ? 'selected' : '' ?>>EUR</option>
-            </select></label></div><button class="mt-5 rounded-full bg-black px-6 py-3 text-sm text-white">Save
+                <option value="USD" <?= ($settings['currency'] ?? 'USD') === 'USD' ? 'selected' : '' ?>>USD</option>
+                <option value="KHR" <?= ($settings['currency'] ?? '') === 'KHR' ? 'selected' : '' ?>>KHR</option>
+                <option value="EUR" <?= ($settings['currency'] ?? '') === 'EUR' ? 'selected' : '' ?>>EUR</option>
+                <option value="CNY"
+                    <?= in_array(($settings['currency'] ?? ''), ['CNY', 'CYN'], true) ? 'selected' : '' ?>>CNY</option>
+            </select><span class="mt-2 block text-xs font-normal text-slate-500">Product prices are entered in USD and
+                shown to customers in the selected currency.</span></label></div><button
+        class="mt-5 rounded-full bg-black px-6 py-3 text-sm text-white">Save
         settings</button>
 </form>
 <?php admin_footer(); ?>

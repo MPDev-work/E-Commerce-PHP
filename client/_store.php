@@ -6,9 +6,50 @@ function e($value)
 {
     return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
 }
-function money($value)
+function store_name(): string
 {
-    return '$' . number_format((float)$value, 2);
+    global $conn;
+    static $name = null;
+
+    if ($name !== null) return $name;
+
+    $name = 'Solis Skin';
+    $result = $conn->query("SELECT setting_value FROM store_settings WHERE setting_key = 'store_name' LIMIT 1");
+    if ($result && ($row = $result->fetch_assoc())) {
+        $savedName = trim((string)$row['setting_value']);
+        if ($savedName !== '') $name = $savedName;
+    }
+
+    return $name;
+}
+function store_currency(): string
+{
+    global $conn;
+    static $currency = null;
+
+    if ($currency !== null) return $currency;
+
+    $currency = 'USD';
+    $result = $conn->query("SELECT setting_value FROM store_settings WHERE setting_key = 'currency' LIMIT 1");
+    if ($result && ($row = $result->fetch_assoc())) {
+        $selected = strtoupper((string)$row['setting_value']);
+        // Accept the previous misspelling while stores move to the CNY option.
+        $currency = $selected === 'CYN' ? 'CNY' : $selected;
+    }
+
+    return in_array($currency, ['USD', 'KHR', 'EUR', 'CNY'], true) ? $currency : 'USD';
+}
+
+function money($value): string
+{
+    $currency = store_currency();
+    $rates = ['USD' => 1, 'KHR' => 4100, 'EUR' => 0.92, 'CNY' => 7.20];
+    $amount = (float)$value * $rates[$currency];
+
+    if ($currency === 'KHR') return '៛' . number_format($amount, 0);
+    if ($currency === 'EUR') return '€' . number_format($amount, 2);
+    if ($currency === 'CNY') return '¥' . number_format($amount, 2);
+    return '$' . number_format($amount, 2);
 }
 function image_for($product)
 {
@@ -29,6 +70,46 @@ function catalogue()
     $result = $conn->query($sql);
     if ($result && $result->num_rows) return $result->fetch_all(MYSQLI_ASSOC);
     return [];
+}
+function latest_products(int $limit = 4): array
+{
+    global $conn;
+    $limit = max(1, min(24, $limit));
+    $sql = "SELECT p.p_id, p.p_title, p.p_price, p.p_qty, p.description, p.p_image, c.category_name,
+      GROUP_CONCAT(DISTINCT st.skin_type_name ORDER BY st.skin_type_name SEPARATOR '|') AS skin_types,
+      GROUP_CONCAT(DISTINCT s.size_name ORDER BY s.sort_order, s.size_name SEPARATOR '|') AS sizes
+      FROM products p LEFT JOIN categories c ON c.category_id = p.category_id
+      LEFT JOIN product_skin_types pst ON pst.product_id = p.p_id LEFT JOIN skin_types st ON st.skin_type_id = pst.skin_type_id
+      LEFT JOIN product_sizes ps ON ps.product_id = p.p_id LEFT JOIN sizes s ON s.size_id = ps.size_id
+      WHERE p.p_qty > 0 GROUP BY p.p_id ORDER BY p.p_id DESC LIMIT {$limit}";
+    $result = $conn->query($sql);
+    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+}
+function top_selling_products(int $limit = 4): array
+{
+    global $conn;
+    $limit = max(1, min(24, $limit));
+    $sql = "SELECT p.p_id, p.p_title, p.p_price, p.p_qty, p.description, p.p_image, c.category_name,
+      COALESCE(sales.sold_quantity, 0) AS sold_quantity,
+      GROUP_CONCAT(DISTINCT st.skin_type_name ORDER BY st.skin_type_name SEPARATOR '|') AS skin_types,
+      GROUP_CONCAT(DISTINCT s.size_name ORDER BY s.sort_order, s.size_name SEPARATOR '|') AS sizes
+      FROM products p
+      LEFT JOIN categories c ON c.category_id = p.category_id
+      LEFT JOIN (
+        SELECT oi.product_id, SUM(oi.quantity) AS sold_quantity
+        FROM order_items oi JOIN orders o ON o.order_id = oi.order_id
+        WHERE o.status = 'completed' GROUP BY oi.product_id
+      ) sales ON sales.product_id = p.p_id
+      LEFT JOIN product_skin_types pst ON pst.product_id = p.p_id
+      LEFT JOIN skin_types st ON st.skin_type_id = pst.skin_type_id
+      LEFT JOIN product_sizes ps ON ps.product_id = p.p_id
+      LEFT JOIN sizes s ON s.size_id = ps.size_id
+      WHERE p.p_qty > 0
+      GROUP BY p.p_id
+      ORDER BY sold_quantity DESC, p.p_id DESC
+      LIMIT {$limit}";
+    $result = $conn->query($sql);
+    return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
 }
 function product_options(array $product, string $field): array
 {
@@ -159,12 +240,25 @@ function cart_remove($itemId): void
     $stmt->bind_param('ii', $itemId, $userId);
     $stmt->execute();
 }
+function clear_cart_after_checkout(): bool
+{
+    global $conn;
+
+    if (!current_user_id()) return true;
+
+    $stmt = $conn->prepare('DELETE ci FROM user_cart_items ci JOIN user_carts uc ON uc.cart_id = ci.cart_id WHERE uc.user_id = ?');
+    if (!$stmt) return false;
+    $userId = current_user_id();
+    $stmt->bind_param('i', $userId);
+    return $stmt->execute();
+}
 function product_label(array $product): string
 {
-    return trim((string)($product['category_name'] ?? '')) ?: 'Solis Skin';
+    return trim((string)($product['category_name'] ?? '')) ?: store_name();
 }
 function store_header($title = 'Shop')
 {
+    $storeName = store_name();
     $count = cart_count();
     $loggedIn = current_user_id() > 0;
     $username = trim((string)($_SESSION['username'] ?? ''));
@@ -175,7 +269,7 @@ function store_header($title = 'Shop')
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title><?= e($title) ?> · Solis Skin</title>
+        <title><?= e($title) ?> | Solis Skin</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link
@@ -187,11 +281,15 @@ function store_header($title = 'Shop')
 
     <body>
         <header class="site-header">
-            <div class="topbar"><a class="logo" href="index.php">SOLIS <span class="logo-skin">SKIN</span></a>
+            <div class="topbar">
+                <a class="logo" href="index.php"><?= e(strtoupper($storeName)) ?></a>
                 <form class="search" action="shopAll.php" method="get"><input name="q" value="<?= e($_GET['q'] ?? '') ?>"
-                        placeholder="Search products"><button aria-label="Search"><i class="bi bi-search"></i></button>
+                        placeholder="Search products">
+                    <button aria-label="Search">
+                        <i class="bi bi-search"></i>
+                    </button>
                 </form>
-                <div class="header-actions"><?php if ($loggedIn): ?><a href="indexAfter.php" class="account-chip"
+                <div class="header-actions"><?php if ($loggedIn): ?><a href="orders.php" class="account-chip"
                             aria-label="Your profile"><span
                                 class="account-initial"><?= e($initial) ?></span><span><?= e($username ?: 'My profile') ?></span></a><a
                             href="../auth/logout.php" class="logout-btn"><i
@@ -201,22 +299,24 @@ function store_header($title = 'Shop')
                         aria-label="Cart"><i class="bi bi-bag"></i><?php if ($count): ?><span
                                 class="badge"><?= $count ?></span><?php endif; ?></a></div>
             </div>
-            <nav class="nav-links"><a href="index.php">Home</a><a href="shopAll.php">Shop</a><a
-                    href="category.php">Categories</a></nav>
+            <nav class="nav-links"><a href="index.php">Home</a>
+                <a href="shopAll.php">Shop</a>
+                <a href="category.php">Categories</a>
+            </nav>
         </header>
     <?php }
 function store_footer()
 { ?>
         <footer class="site-footer">
             <div class="footer-grid">
-                <div class="footer-brand"><a class="logo" href="index.php">SOLIS <span class="logo-skin">SKIN</span></a>
+                <div class="footer-brand"><a class="logo" href="index.php"><?= e(strtoupper(store_name())) ?></a>
                     <p class="brand-desc">Your trusted destination for healthy and glowing skin. 100% authentic skincare
                         products.</p>
                     <ul class="social-links">
-                        <li><a href="#"><i class="bi bi-facebook"></i> Facebook</a></li>
-                        <li><a href="#"><i class="bi bi-tiktok"></i> TikTok</a></li>
-                        <li><a href="#"><i class="bi bi-instagram"></i> Instagram</a></li>
-                        <li><a href="#"><i class="bi bi-youtube"></i> YouTube</a></li>
+                        <li><a target="_blank" href="https://web.facebook.com/saltenten"><i class="bi bi-facebook"></i> Facebook</a></li>
+                        <li><a target="_blank" href="#"><i class="bi bi-tiktok"></i> TikTok</a></li>
+                        <li><a target="_blank" href="#"><i class="bi bi-instagram"></i> Instagram</a></li>
+                        <li><a target="_blank" href="https://www.youtube.com/@Felixr_Zzz"><i class="bi bi-youtube"></i> YouTube</a></li>
                     </ul>
                 </div>
                 <div class="footer-links">
@@ -233,8 +333,8 @@ function store_footer()
                 <div class="footer-links">
                     <h4>Customer Service</h4>
                     <ul>
-                        <li><a href="#">My Account</a></li>
-                        <li><a href="#">Order Tracking</a></li>
+                        <li><a href="orders.php">My Account</a></li>
+                        <li><a href="orders.php">Order History</a></li>
                         <li><a href="#">Shipping Policy</a></li>
                         <li><a href="#">Return Policy</a></li>
                         <li><a href="#">FAQ</a></li>

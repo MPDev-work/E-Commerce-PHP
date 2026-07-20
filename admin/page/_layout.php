@@ -1,23 +1,41 @@
 <?php
 require_once __DIR__ . '/_bootstrap.php';
 
+function admin_store_name(): string
+{
+  global $conn;
+  static $name = null;
+
+  if ($name !== null) return $name;
+
+  $name = 'Solis Skin';
+  $result = $conn->query("SELECT setting_value FROM store_settings WHERE setting_key = 'store_name' LIMIT 1");
+  if ($result && ($row = $result->fetch_assoc())) {
+    $savedName = trim((string)$row['setting_value']);
+    if ($savedName !== '') $name = $savedName;
+  }
+
+  return $name;
+}
+
 function admin_header(string $title, string $active): void
 {
-  global $user; ?>
+  global $user;
+  $storeName = admin_store_name(); ?>
   <!doctype html>
   <html lang="en">
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title><?= e($title) ?> | Solis Skin</title>
+    <title><?= e($title) ?> | <?= e($storeName) ?></title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   </head>
 
   <body class="bg-[#f2f2f6] text-slate-900 antialiased">
-    <header class="fixed inset-x-5 top-0 z-30 flex h-16 items-center justify-between bg-[#f2f2f6]/95 backdrop-blur">
-      <a href="overviews.php" class="text-2xl font-semibold tracking-tight uppercase">solis skin</a>
+    <header class="fixed inset-x-5 top-0 z-50 flex h-16 items-center justify-between bg-[#f2f2f6]/95 backdrop-blur">
+      <a href="overviews.php" class="text-2xl font-semibold tracking-tight uppercase"><?= e($storeName) ?></a>
       <div class="flex items-center gap-4">
         <div class="hidden items-center gap-2 sm:flex">
           <span
@@ -30,7 +48,7 @@ function admin_header(string $title, string $active): void
       </div>
     </header>
     <aside
-      class="fixed bottom-0 left-0 top-16 z-20 hidden w-64 flex-col gap-5 overflow-y-auto bg-[#f2f2f6] p-3 md:flex">
+      class="fixed bottom-0 left-0 top-16 z-20 hidden w-64 flex-col gap-5 overflow-y-auto bg-[#f2f2f6] p-3 md:flex scrollbar-none">
       <?php admin_nav_group(
         'Main menu',
         [['overviews.php', 'Overview', 'house'], ['orders.php', 'Orders', 'bag-check'], ['products.php', 'All
@@ -41,14 +59,9 @@ function admin_header(string $title, string $active): void
       ?> <?php admin_nav_group('Account Info', [['editProfile.php', 'Edit
       profile', 'person'], ['settting.php', 'Settings', 'gear']], $active); ?> <?php
                                                                                 admin_nav_group('Support', [['helpCenter.php', 'Help
-      center', 'question-circle']], $active); ?>
-      <a class="group absolute w-[calc(256px-20px)] h-10 flex justify-center items-center bottom-2.5 bg-white text-black rounded-[25px] transition duration-200 hover:bg-black hover:text-white"
-        href="../../auth/logout.php">
-        <i class="bi bi-arrow-bar-left text-lg text-black transition duration-200 group-hover:text-white"></i>
-        Log out
-      </a>
+      center', 'question-circle'], ['../../auth/logout.php', 'Log out', 'arrow-bar-left']], $active); ?>
     </aside>
-    <main class="min-h-screen pt-16 md:ml-64">
+    <main class="relative z-0 min-h-screen pt-16 md:ml-64">
       <div class="min-h-[calc(100vh-4rem)] rounded-tl-[30px] bg-white p-4 md:p-6">
       <?php }
     function admin_nav_group(string $label, array $items, string
